@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="1-Tick RSI Indicator for Deriv — Smooth RSI with Overbought/Oversold signals." />
+  <title>1-Tick RSI — Deriv</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">📈</span>
+        <span>RSI <em>Live</em></span>
+      </div>
+      <div class="status" id="status">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- CONTROL BAR -->
+    <section class="control-bar">
+      <div class="control-group">
+        <label>Market</label>
+        <select id="marketSelect">
+          <option value="R_10">V10</option>
+          <option value="R_25">V25</option>
+          <option value="R_50">V50</option>
+          <option value="R_75">V75</option>
+          <option value="R_100" selected>V100</option>
+          <option value="1HZ10V">V10 1s</option>
+          <option value="1HZ25V">V25 1s</option>
+          <option value="1HZ50V">V50 1s</option>
+          <option value="1HZ75V">V75 1s</option>
+          <option value="1HZ100V">V100 1s</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Period</label>
+        <input type="number" id="rsiPeriod" value="14" min="3" max="50" />
+      </div>
+
+      <div class="control-group">
+        <label>Overbought</label>
+        <input type="number" id="overbought" value="70" min="60" max="90" />
+      </div>
+
+      <div class="control-group">
+        <label>Oversold</label>
+        <input type="number" id="oversold" value="30" min="10" max="40" />
+      </div>
+
+      <button id="resetBtn" class="btn-reset">↺ Reset</button>
+    </section>
+
+    <!-- SIGNAL HERO -->
+    <section class="signal-hero" id="signalHero">
+      <div class="signal-glow" id="signalGlow"></div>
+      <div class="signal-content">
+        <div class="signal-icon" id="signalIcon">⏳</div>
+        <div class="signal-text">
+          <div class="signal-label">CURRENT SIGNAL</div>
+          <div class="signal-title" id="signalTitle">Waiting for data</div>
+          <div class="signal-sub" id="signalSub">Collecting ticks to calculate RSI…</div>
+        </div>
+        <div class="signal-value" id="signalValue">—</div>
+      </div>
+    </section>
+
+    <!-- CHART PANEL -->
+    <section class="chart-panel">
+      <div class="chart-header">
+        <div class="chart-title-group">
+          <h2>Tick Chart & RSI</h2>
+          <span class="chart-market-pill" id="chartMarket">V100</span>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot price"></span>Price</span>
+          <span class="legend-item"><span class="legend-dot rsi"></span>RSI</span>
+          <span class="legend-item"><span class="legend-dot ob"></span>Overbought</span>
+          <span class="legend-item"><span class="legend-dot os"></span>Oversold</span>
+        </div>
+      </div>
+
+      <div class="chart-stack">
+        <div class="chart-block price-block">
+          <div class="chart-label">PRICE (per tick)</div>
+          <canvas id="tickChart"></canvas>
+        </div>
+        <div class="chart-block rsi-block">
+          <div class="chart-label">RSI · <span id="rsiInline">—</span></div>
+          <canvas id="rsiChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS ROW -->
+    <section class="stats-row">
+      <div class="stat-tile">
+        <div class="stat-tile-label">Ticks</div>
+        <div class="stat-tile-value" id="tickCount">0</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">RSI Value</div>
+        <div class="stat-tile-value accent" id="rsiValue">—</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">Zone</div>
+        <div class="stat-tile-value" id="zoneValue">—</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-tile-label">Last Signal</div>
+        <div class="stat-tile-value" id="lastSignal">—</div>
+      </div>
+    </section>
+
+    <p class="disclaimer">
+      ⚠️ 1-tick RSI is highly sensitive. On random synthetic indices, RSI does not predict future direction. Visual analyzer only.
+    </p>
+
+  </main>
+
+  <footer class="footer">
+    <p>1-Tick RSI · Not financial advice</p>
+    <p class="footer-links">
+      <a href="https://sammshawn.github.io/portofolio/" target="_blank" rel="noopener">Portfolio</a>
+      <span>·</span>
+      <a href="https://sammshawn.github.io/ai-scanner/" target="_blank" rel="noopener">AI Scanner</a>
+      <span>·</span>
+      <a href="https://sammshawn.github.io/multi-scanner/" target="_blank" rel="noopener">Multi-Scanner</a>
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
